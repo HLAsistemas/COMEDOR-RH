@@ -1,0 +1,25 @@
+services:
+  comedor-rh:
+    build:
+      context: .
+    image: comedor-rh:local
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+    ports:
+      - "${COMEDOR_RH_PORT:-8001}:80"
+    volumes:
+      - comedor-storage:/var/www/html/storage
+    networks:
+      - hla-database
+
+networks:
+  hla-database:
+    external: true
+    name: ${HLA_DOCKER_NETWORK:-hla-network}
+
+volumes:
+  comedor-storage:
