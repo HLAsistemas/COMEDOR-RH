@@ -69,6 +69,14 @@
         .menu-card strong { font-size: 1.15rem; }
         .menu-card p { margin: 0; color: #60736b; }
         .menu-card .menu-open { margin-top: auto; color: #165b49; font-weight: 700; }
+        .dish-list { display: grid; gap: 1rem; }
+        .dish-entry { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; align-items: end; gap: .75rem; padding: 1rem; border: 1px solid #dce8e2; border-radius: 10px; background: #f8faf9; }
+        .dish-entry textarea { font: inherit; min-height: 42px; width: 100%; resize: vertical; border: 1px solid #aebfb7; border-radius: 8px; padding: .55rem .7rem; background: white; }
+        .dish-entry .error { grid-column: 1 / -1; margin: 0; }
+        @media (max-width: 600px) {
+            .dish-entry { grid-template-columns: 1fr; }
+            .dish-entry .error { grid-column: auto; }
+        }
         @media (max-width: 600px) {
             main { margin-top: 1rem; }
             .card { padding: 1rem; }
@@ -88,6 +96,7 @@
         @auth
             <div class="header-nav">
                 <a href="{{ route('menu') }}">Menú</a>
+                <a href="{{ route('menu-dia.index') }}">Menú del día</a>
                 <a href="{{ route('consumos.index') }}">Registro</a>
                 <a href="{{ route('reportes.index') }}">Reporte</a>
                 <span>{{ auth()->user()->name }}</span>

@@ -9,17 +9,18 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
-    ports:
-      - "${COMEDOR_RH_PORT:-8001}:80"
+      SESSION_SECURE_COOKIE: "true"
+    expose:
+      - "80"
     volumes:
       - comedor-storage:/var/www/html/storage
     networks:
       - hla-database
 
+volumes:
+  comedor-storage:
+
 networks:
   hla-database:
     external: true
-    name: ${HLA_DOCKER_NETWORK:-hla-network}
-
-volumes:
-  comedor-storage:
+    name: "${HLA_DOCKER_NETWORK:?Set HLA_DOCKER_NETWORK to the Laradock MySQL network}"
