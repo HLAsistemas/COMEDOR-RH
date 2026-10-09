@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConsumosController;
+use App\Http\Controllers\MenuDiaController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,9 @@ Route::post('/login', [AuthController::class, 'login'])
 Route::middleware('auth')->group(function () {
     Route::view('/menu', 'menu')->name('menu');
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/menu-dia', [MenuDiaController::class, 'index'])->name('menu-dia.index');
+    Route::post('/menu-dia', [MenuDiaController::class, 'store'])->name('menu-dia.store');
+    Route::post('/menu-dia/extras', [MenuDiaController::class, 'storeExtras'])->name('menu-dia.extras.store');
     Route::get('/consumos', [ConsumosController::class, 'index'])->name('consumos.index');
     Route::get('/reporte-comidas', [ConsumosController::class, 'reporte'])->name('reportes.index');
     Route::get('/reporte-comidas/exportar', [ConsumosController::class, 'exportarReporte'])->name('reportes.exportar');

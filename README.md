@@ -16,23 +16,48 @@ encabezado permite regresar al menú o cambiar de sección.
 
 Requiere PHP 8.2+, Composer y Node.js. Ejecuta `composer install` y `npm install`.
 Si aún no existe `.env`, copia `.env.example` a `.env`; configura la conexión
-a la base existente y genera la clave con `php artisan key:generate`. Arranca
-Vite en una terminal con `npm run dev` y Laravel en otra con
-`php artisan serve --host=192.168.11.123 --port=8001`.
+a la base existente y genera la clave con `php artisan key:generate`. Para
+desarrollo local por HTTP, configura `APP_ENV=local`, `APP_URL=http://localhost`
+y `SESSION_SECURE_COOKIE=false`. Arranca Vite en una terminal con
+`npm run dev` y Laravel en otra con `php artisan serve`.
 
 ### Contenedor y base compartida
 
-1. Copia `.env.example` a `.env` y configura la conexión MySQL a la base de HLA
-   con los valores entregados de forma segura por su administrador.
-2. Configura `HLA_DOCKER_NETWORK` con el nombre de la red Docker existente
-   compartida por HLA y MySQL. Usa en `DB_HOST` el nombre de servicio o alias DNS
-   del contenedor MySQL dentro de esa red.
-3. Establece `APP_ENV=production`, `APP_DEBUG=false` y el `APP_URL` real.
-4. Construye la imagen con `docker compose build` y genera una clave con
+COMEDOR-RH se ejecuta como contenedor independiente del stack Laradock y se une
+a la red existente donde Laradock conecta sus servicios con MySQL. Su imagen
+instala Composer y compila Vite durante `docker compose build`; no hace falta
+ejecutar `npm run build` en el contenedor `workspace` para este proyecto.
+
+1. Conéctate al servidor por SSH usando un método seguro y entra a la carpeta
+   Laradock. Inicia los servicios que HLA necesita si aún no están levantados:
+   `docker compose up -d nginx mysql workspace phpmyadmin certbot`.
+2. Obtén el nombre de la red a la que está conectado el contenedor MySQL:
+   `docker inspect "$(docker compose ps -q mysql)" --format '{{range $name, $config := .NetworkSettings.Networks}}{{$name}}{{"\n"}}{{end}}'`.
+   Si muestra más de una red, usa la que comparte con la aplicación HLA.
+3. En la carpeta del proyecto COMEDOR-RH, copia `.env.example` a `.env`.
+   Configura `HLA_DOCKER_NETWORK` con el nombre encontrado, además de
+   `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD`. `DB_HOST=mysql` apunta al
+   servicio Laradock por su alias de red. Usa una cuenta dedicada con permisos
+   mínimos, no `root`, y ajusta `APP_URL` al hostname HTTPS del servidor.
+   `SESSION_SECURE_COOKIE=true` debe permanecer habilitado en producción.
+4. Construye la imagen desde la carpeta COMEDOR-RH:
+   `docker compose build`.
+5. Genera una clave para esta instalación:
    `docker compose run --rm --no-deps comedor-rh php artisan key:generate --show`.
-   Copia el valor mostrado a `APP_KEY` en `.env`.
-5. Ejecuta `docker compose up -d`. El puerto por defecto es `8001` y se puede
-   cambiar con `COMEDOR_RH_PORT`.
+   Copia el valor completo a `APP_KEY` en `.env`; no uses la clave de HLA.
+6. Antes de iniciar, pide al DBA que compruebe/aplique las migraciones
+   `comedor_rh_*` con una cuenta de despliegue separada. No ejecutes
+   migraciones sobre HLA sin su autorización.
+7. Inicia y verifica el contenedor desde la carpeta COMEDOR-RH:
+   `docker compose up -d`, `docker compose ps` y
+   `docker compose logs --tail=100 comedor-rh`. El servicio no publica un
+   puerto HTTP en el host; solo es accesible desde la red Docker.
+8. Configura el Nginx de Laradock como proxy inverso del servicio
+   `comedor-rh:80`, con un certificado TLS válido y redirección de HTTP a HTTPS.
+   Comprueba que Nginx y COMEDOR-RH compartan la red Docker configurada. En el
+   firewall permite el puerto HTTPS (443) y no publiques el puerto HTTP del
+   contenedor. Abre `https://<hostname>/login` y crea una cuenta con
+   `docker compose exec comedor-rh php artisan comedor:operator`.
 
 El Compose no ejecuta migraciones. Antes de liberar, coordina con HLA la creación
 de las tablas `comedor_rh_users` y `comedor_rh_consumos`; la aplicación usa una
@@ -45,9 +70,10 @@ local persistido en un volumen y los trabajos se ejecutan de forma síncrona.
 Configura firewall y permisos de MySQL de forma restrictiva, y nunca agregues
 `.env` ni credenciales al control de versiones.
 
-Después de crear las tablas, crea cada acceso autorizado con
-`docker compose exec comedor-rh php artisan comedor:operator`; el comando
-solicita la contraseña sin mostrarla.
+El comando `comedor:operator` solicita la contraseña sin mostrarla. Para
+actualizaciones, trae el código nuevo, ejecuta `docker compose build` y después
+`docker compose up -d`; las comidas y sesiones locales se conservan en el
+volumen `comedor-storage`.
 
 ## About Laravel
 
