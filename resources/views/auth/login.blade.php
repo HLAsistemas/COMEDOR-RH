@@ -6,7 +6,7 @@
     <section class="card login">
         <h1>Iniciar sesión</h1>
         <p class="muted">Acceso para operadores autorizados del comedor.</p>
-        <form method="post" action="{{ route('login.store') }}">
+        <form method="post" action="{{ route('/comedor/login.store') }}">
             @csrf
             <div style="margin-bottom: 1rem">
                 <label for="email">Correo</label>
