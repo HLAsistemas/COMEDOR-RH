@@ -33,8 +33,9 @@ class AuthController extends Controller
         }
 
         $request->session()->regenerate();
+        $request->session()->forget('url.intended');
 
-        return redirect()->intended(route('menu'));
+        return redirect()->route('menu');
     }
 
     public function logout(Request $request): RedirectResponse

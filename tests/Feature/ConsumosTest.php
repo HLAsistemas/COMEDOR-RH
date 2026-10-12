@@ -42,10 +42,12 @@ class ConsumosTest extends TestCase
     {
         $operator = $this->crearOperador();
 
-        $this->post(route('login.store'), [
-            'email' => $operator->email,
-            'password' => 'a-password-long-enough',
-        ])->assertRedirect(route('menu'));
+        $this->withSession(['url.intended' => '/menu'])
+            ->post(route('login.store'), [
+                'email' => $operator->email,
+                'password' => 'a-password-long-enough',
+            ])
+            ->assertRedirect(route('menu'));
 
         $this->assertAuthenticatedAs($operator);
     }
