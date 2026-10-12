@@ -38,7 +38,8 @@ ejecutar `npm run build` en el contenedor `workspace` para este proyecto.
    Configura `HLA_DOCKER_NETWORK` con el nombre encontrado, además de
    `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD`. `DB_HOST=mysql` apunta al
    servicio Laradock por su alias de red. Usa una cuenta dedicada con permisos
-   mínimos, no `root`, y ajusta `APP_URL` al hostname HTTPS del servidor.
+   mínimos, no `root`, y ajusta `APP_URL` al hostname HTTPS del servidor más
+   el prefijo `/comedor`. `ASSET_URL` debe conservar el mismo prefijo.
    `SESSION_SECURE_COOKIE=true` debe permanecer habilitado en producción.
 4. Construye la imagen desde la carpeta COMEDOR-RH:
    `docker compose build`.
@@ -52,11 +53,12 @@ ejecutar `npm run build` en el contenedor `workspace` para este proyecto.
    `docker compose up -d`, `docker compose ps` y
    `docker compose logs --tail=100 comedor-rh`. El servicio no publica un
    puerto HTTP en el host; solo es accesible desde la red Docker.
-8. Configura el Nginx de Laradock como proxy inverso del servicio
-   `comedor-rh:80`, con un certificado TLS válido y redirección de HTTP a HTTPS.
-   Comprueba que Nginx y COMEDOR-RH compartan la red Docker configurada. En el
-   firewall permite el puerto HTTPS (443) y no publiques el puerto HTTP del
-   contenedor. Abre `https://<hostname>/login` y crea una cuenta con
+8. Configura el Nginx de Laradock para enviar las solicitudes de
+   `/comedor/` al servicio `comedor-rh:80` conservando ese prefijo en la URI,
+   con un certificado TLS válido y redirección de HTTP a HTTPS. Comprueba que
+   Nginx y COMEDOR-RH compartan la red Docker configurada. En el firewall
+   permite el puerto HTTPS (443) y no publiques el puerto HTTP del contenedor.
+   Abre `https://<hostname>/comedor/login` y crea una cuenta con
    `docker compose exec comedor-rh php artisan comedor:operator`.
 
 El Compose no ejecuta migraciones. Antes de liberar, coordina con HLA la creación

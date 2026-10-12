@@ -34,15 +34,15 @@ class ConsumosTest extends TestCase
 
     public function test_guests_are_sent_to_the_operator_login(): void
     {
-        $this->get('/consumos')
-            ->assertRedirect('/login');
+        $this->get(route('consumos.index'))
+            ->assertRedirect(route('login'));
     }
 
     public function test_operator_can_sign_in_with_their_comedor_account(): void
     {
         $operator = $this->crearOperador();
 
-        $this->post('/login', [
+        $this->post(route('login.store'), [
             'email' => $operator->email,
             'password' => 'a-password-long-enough',
         ])->assertRedirect(route('menu'));
@@ -57,7 +57,7 @@ class ConsumosTest extends TestCase
             ->assertRedirect(route('menu'));
 
         $this->actingAs(User::query()->first())
-            ->get('/menu')
+            ->get(route('menu'))
             ->assertOk()
             ->assertSee('Registro de comidas')
             ->assertSee('Reporte por rango de fechas')
@@ -92,7 +92,7 @@ class ConsumosTest extends TestCase
         Schema::drop('trabajadores_gecoad_rh');
 
         $this->actingAs($operator)
-            ->getJson('/empleados/buscar?q=29&empresa=gecoad')
+            ->getJson(route('empleados.buscar', ['q' => '29', 'empresa' => 'gecoad']))
             ->assertStatus(503)
             ->assertJsonPath(
                 'message',
@@ -118,7 +118,7 @@ class ConsumosTest extends TestCase
         ]);
 
         $this->actingAs($operator)
-            ->getJson('/empleados/buscar?q=29&empresa=hilaturas')
+            ->getJson(route('empleados.buscar', ['q' => '29', 'empresa' => 'hilaturas']))
             ->assertOk()
             ->assertJsonPath('empleados.0.clave', '29');
     }
@@ -135,7 +135,7 @@ class ConsumosTest extends TestCase
         ]);
 
         $this->actingAs($operator)
-            ->getJson('/empleados/buscar?q=00123&empresa=hilaturas')
+            ->getJson(route('empleados.buscar', ['q' => '00123', 'empresa' => 'hilaturas']))
             ->assertOk()
             ->assertJsonPath(
                 'empleados.0.foto_url',
@@ -161,14 +161,14 @@ class ConsumosTest extends TestCase
         ];
 
         $this->actingAs($operator)
-            ->post('/consumos', $datos)
+            ->post(route('consumos.store'), $datos)
             ->assertRedirect(route('consumos.index'))
             ->assertSessionHas('status');
 
         $this->actingAs($operator)
-            ->from('/consumos')
-            ->post('/consumos', $datos)
-            ->assertRedirect('/consumos')
+            ->from(route('consumos.index'))
+            ->post(route('consumos.store'), $datos)
+            ->assertRedirect(route('consumos.index'))
             ->assertSessionHasErrors('empleado_clave');
 
         $this->assertDatabaseCount('comedor_rh_consumos', 1);
@@ -190,7 +190,7 @@ class ConsumosTest extends TestCase
         ]);
 
         $this->actingAs($operator)
-            ->postJson('/consumos', [
+            ->postJson(route('consumos.store'), [
                 'empresa' => 'gecoad',
                 'empleado_clave' => '00123',
             ])
@@ -216,13 +216,13 @@ class ConsumosTest extends TestCase
         ]);
 
         $this->actingAs($operator)
-            ->from('/consumos')
-            ->post('/consumos', [
+            ->from(route('consumos.index'))
+            ->post(route('consumos.store'), [
                 'empresa' => 'hilaturas',
                 'empleado_clave' => '00123',
                 'fecha_consumo' => today()->subDay()->toDateString(),
             ])
-            ->assertRedirect('/consumos')
+            ->assertRedirect(route('consumos.index'))
             ->assertSessionHasErrors('fecha_consumo');
 
         $this->assertDatabaseCount('comedor_rh_consumos', 0);
