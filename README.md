@@ -40,7 +40,10 @@ ejecutar `npm run build` en el contenedor `workspace` para este proyecto.
    servicio Laradock por su alias de red. Usa una cuenta dedicada con permisos
    mínimos, no `root`, y ajusta `APP_URL` al hostname HTTPS del servidor más
    el prefijo `/comedor`. `ASSET_URL` debe conservar el mismo prefijo.
-   `SESSION_SECURE_COOKIE=true` debe permanecer habilitado en producción.
+   Mantén `SESSION_SECURE_COOKIE=true` cuando se accede por HTTPS. Si el
+   despliegue se prueba directamente por HTTP (sin TLS), configúralo en `false`
+   tanto en `.env` como en la variable del servicio Compose; el navegador no
+   envía cookies `Secure` por HTTP, y se perdería la sesión al iniciar sesión.
 4. Construye la imagen desde la carpeta COMEDOR-RH:
    `docker compose build`.
 5. Genera una clave para esta instalación:
