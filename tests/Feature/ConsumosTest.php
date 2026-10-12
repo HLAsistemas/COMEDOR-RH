@@ -52,6 +52,13 @@ class ConsumosTest extends TestCase
         $this->assertAuthenticatedAs($operator);
     }
 
+    public function test_login_page_brand_link_keeps_the_comedor_prefix(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSee('href="' . route('login') . '"', false);
+    }
+
     public function test_authenticated_home_shows_menu_options_for_meals_and_reports(): void
     {
         $this->actingAs($this->crearOperador())

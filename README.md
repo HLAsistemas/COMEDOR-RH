@@ -74,8 +74,11 @@ Configura firewall y permisos de MySQL de forma restrictiva, y nunca agregues
 
 El comando `comedor:operator` solicita la contraseña sin mostrarla. Para
 actualizaciones, trae el código nuevo, ejecuta `docker compose build` y después
-`docker compose up -d`; las comidas y sesiones locales se conservan en el
-volumen `comedor-storage`.
+`docker compose up -d`. Si se despliega sobre un contenedor existente, limpia
+las cachés de Laravel con
+`docker compose exec comedor-rh php artisan optimize:clear`; verifica que
+`php artisan route:list --path=comedor` muestre las rutas con el prefijo. Las
+comidas y sesiones locales se conservan en el volumen `comedor-storage`.
 
 ## About Laravel
 
