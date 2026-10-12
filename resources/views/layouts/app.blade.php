@@ -91,7 +91,7 @@
 <body>
     <header>
         <a class="brand" href="@auth{{ route('menu') }}@else{{ route('login') }}@endauth">
-            <img src="{{ asset('images/logo-comedor.png') }}" alt="Comedor Hilaturas Los Ángeles">
+            <img src="{{ asset('/comedor/images/logo-comedor.png') }}" alt="Comedor Hilaturas Los Ángeles">
         </a>
         @auth
             <div class="header-nav">
