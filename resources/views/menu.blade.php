@@ -41,6 +41,19 @@
                 <p>Consulta cuántas comidas tuvo cada empleado en un periodo.</p>
                 <span class="menu-open">Abrir reporte →</span>
             </a>
+
+            @if (auth()->user()->is_admin)
+                <a class="menu-card" href="{{ route('usuarios.index') }}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM20 8v6M23 11h-6" />
+                        </svg>
+                    </span>
+                    <strong>Administrar usuarios</strong>
+                    <p>Crea cuentas de acceso para los operadores del comedor.</p>
+                    <span class="menu-open">Administrar usuarios →</span>
+                </a>
+            @endif
         </div>
     </section>
 @endsection

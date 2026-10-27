@@ -39,6 +39,7 @@
                 <button type="submit">Guardar menú del día</button>
             </div>
         </form>
+
     </section>
 
     <section class="card">
@@ -75,6 +76,49 @@
                 <button type="submit">Guardar platillos extra</button>
             </div>
         </form>
+
+        <hr style="border: 0; border-top: 1px solid #e5ece8; margin: 1.5rem 0">
+        <h3>Platillos extra fijos</h3>
+        <p class="muted">Agrega aquí los extras que se ofrecen habitualmente. Los platillos activos aparecerán automáticamente en el menú todos los días.</p>
+        <form method="post" action="{{ route('menu-dia.extras-fijos.store') }}">
+            @csrf
+            <div class="dish-entry">
+                <div>
+                    <label for="fixed-extra-name">Nombre del platillo extra fijo</label>
+                    <input id="fixed-extra-name" name="nombre" value="{{ old('nombre') }}" maxlength="150" required>
+                    @error('nombre')
+                        <p class="error">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label for="fixed-extra-description">Descripción</label>
+                    <textarea id="fixed-extra-description" name="descripcion" maxlength="2000" required>{{ old('descripcion') }}</textarea>
+                    @error('descripcion')
+                        <p class="error">{{ $message }}</p>
+                    @enderror
+                </div>
+                <button type="submit">Agregar platillo fijo</button>
+            </div>
+        </form>
+
+        @if ($extrasFijos->isNotEmpty())
+            <h3 style="margin-top: 1.5rem">Platillos fijos configurados</h3>
+            <div class="dish-list">
+                @foreach ($extrasFijos as $extraFijo)
+                    <article class="dish-entry">
+                        <div>
+                            <strong>{{ $extraFijo->nombre }}</strong>
+                            <p class="muted" style="margin: .25rem 0 0">{{ $extraFijo->is_active ? 'Activo: aparece todos los días' : 'Inactivo: no aparece en el menú' }}</p>
+                        </div>
+                        <p style="margin: 0">{{ $extraFijo->descripcion }}</p>
+                        <form method="post" action="{{ route('menu-dia.extras-fijos.toggle', $extraFijo->id) }}">
+                            @csrf
+                            <button class="secondary" type="submit">{{ $extraFijo->is_active ? 'Desactivar' : 'Activar' }}</button>
+                        </form>
+                    </article>
+                @endforeach
+            </div>
+        @endif
     </section>
 
     <section class="card">
@@ -89,6 +133,25 @@
                             <strong>{{ $platillo->nombre }}</strong>
                         </div>
                         <p style="margin: 0">{{ $platillo->descripcion }}</p>
+                    </article>
+                @endforeach
+            </div>
+        @endif
+    </section>
+
+    <section class="card">
+        <h2>Platillos extra fijos disponibles hoy</h2>
+        @if ($extrasFijosActivos->isEmpty())
+            <p class="muted">No hay platillos extra fijos activos.</p>
+        @else
+            <div class="dish-list">
+                @foreach ($extrasFijosActivos as $extraFijo)
+                    <article class="dish-entry">
+                        <div>
+                            <strong>{{ $extraFijo->nombre }}</strong>
+                            <p class="muted" style="margin: .25rem 0 0">Platillo fijo</p>
+                        </div>
+                        <p style="margin: 0">{{ $extraFijo->descripcion }}</p>
                     </article>
                 @endforeach
             </div>

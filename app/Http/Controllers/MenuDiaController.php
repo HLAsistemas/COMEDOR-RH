@@ -23,6 +23,14 @@ class MenuDiaController extends Controller
                 ->where('fecha', $fecha)
                 ->orderBy('id')
                 ->get(),
+            'extrasFijos' => DB::table('comedor_rh_menu_dia_extras_fijos')
+                ->orderByDesc('is_active')
+                ->orderBy('nombre')
+                ->get(),
+            'extrasFijosActivos' => DB::table('comedor_rh_menu_dia_extras_fijos')
+                ->where('is_active', true)
+                ->orderBy('nombre')
+                ->get(),
         ]);
     }
 
@@ -96,5 +104,51 @@ class MenuDiaController extends Controller
         return redirect()
             ->route('menu-dia.index')
             ->with('status', 'Platillos extra agregados correctamente.');
+    }
+
+    public function storeFixedExtra(Request $request): RedirectResponse
+    {
+        $datos = $request->validate([
+            'nombre' => ['required', 'string', 'max:150'],
+            'descripcion' => ['required', 'string', 'max:2000'],
+        ], [
+            'nombre.required' => 'Escribe el nombre del platillo extra fijo.',
+            'nombre.max' => 'El nombre no debe exceder 150 caracteres.',
+            'descripcion.required' => 'Escribe la descripción del platillo extra fijo.',
+            'descripcion.max' => 'La descripción no debe exceder 2000 caracteres.',
+        ]);
+
+        DB::table('comedor_rh_menu_dia_extras_fijos')->insert([
+            'nombre' => $datos['nombre'],
+            'descripcion' => $datos['descripcion'],
+            'is_active' => true,
+            'registrado_por' => $request->user()->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()
+            ->route('menu-dia.index')
+            ->with('status', 'Platillo extra fijo agregado. Aparecerá todos los días.');
+    }
+
+    public function toggleFixedExtra(int $extraFijo): RedirectResponse
+    {
+        $platillo = DB::table('comedor_rh_menu_dia_extras_fijos')
+            ->where('id', $extraFijo)
+            ->firstOrFail();
+
+        DB::table('comedor_rh_menu_dia_extras_fijos')
+            ->where('id', $extraFijo)
+            ->update([
+                'is_active' => ! $platillo->is_active,
+                'updated_at' => now(),
+            ]);
+
+        return redirect()
+            ->route('menu-dia.index')
+            ->with('status', $platillo->is_active
+                ? 'El platillo fijo se desactivó y ya no aparecerá en los próximos menús.'
+                : 'El platillo fijo se activó y aparecerá todos los días.');
     }
 }

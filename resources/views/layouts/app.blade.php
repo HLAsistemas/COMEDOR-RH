@@ -69,6 +69,7 @@
         .menu-card strong { font-size: 1.15rem; }
         .menu-card p { margin: 0; color: #60736b; }
         .menu-card .menu-open { margin-top: auto; color: #165b49; font-weight: 700; }
+        .form-error { color: #9c3028; font-size: .9rem; margin: .25rem 0 0; }
         .dish-list { display: grid; gap: 1rem; }
         .dish-entry { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)) auto; align-items: end; gap: .75rem; padding: 1rem; border: 1px solid #dce8e2; border-radius: 10px; background: #f8faf9; }
         .dish-entry textarea { font: inherit; min-height: 42px; width: 100%; resize: vertical; border: 1px solid #aebfb7; border-radius: 8px; padding: .55rem .7rem; background: white; }
@@ -99,6 +100,9 @@
                 <a href="{{ route('menu-dia.index') }}">Menú del día</a>
                 <a href="{{ route('consumos.index') }}">Registro</a>
                 <a href="{{ route('reportes.index') }}">Reporte</a>
+                @if (auth()->user()->is_admin)
+                    <a href="{{ route('usuarios.index') }}">Usuarios</a>
+                @endif
                 <span>{{ auth()->user()->name }}</span>
                 <form method="post" action="{{ route('logout') }}">
                     @csrf

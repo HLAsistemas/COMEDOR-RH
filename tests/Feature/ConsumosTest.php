@@ -39,13 +39,13 @@ class ConsumosTest extends TestCase
             ->assertRedirect(route('login'));
     }
 
-    public function test_operator_can_sign_in_with_their_comedor_account(): void
+    public function test_operator_can_sign_in_with_their_username(): void
     {
         $operator = $this->crearOperador();
 
         $this->withSession(['url.intended' => '/menu'])
             ->post(route('login.store'), [
-                'email' => $operator->email,
+                'username' => $operator->username,
                 'password' => 'a-password-long-enough',
             ])
             ->assertRedirect(route('menu'));
@@ -393,6 +393,7 @@ class ConsumosTest extends TestCase
     {
         return User::query()->create([
             'name' => 'Operador',
+            'username' => 'operador',
             'email' => 'operador@example.test',
             'password' => 'a-password-long-enough',
             'is_active' => true,

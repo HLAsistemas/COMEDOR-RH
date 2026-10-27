@@ -21,14 +21,19 @@ class AuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
+        $username = $request->input('username');
+        if (is_string($username)) {
+            $request->merge(['username' => strtolower(trim($username))]);
+        }
+
         $credentials = $request->validate([
-            'email' => ['required', 'email', 'max:255'],
+            'username' => ['required', 'string', 'max:255'],
             'password' => ['required', 'string'],
         ]);
 
         if (! Auth::attempt($credentials + ['is_active' => true])) {
             throw ValidationException::withMessages([
-                'email' => 'El correo o la contraseña no son correctos.',
+                'username' => 'El usuario o la contraseña no son correctos.',
             ]);
         }
 

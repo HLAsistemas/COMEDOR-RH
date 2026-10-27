@@ -4,9 +4,10 @@ Aplicación independiente para el sistema de comedor y recursos humanos de HLA.
 Este proyecto usa Laravel 12 y requiere PHP 8.2 o posterior,
 separado del despliegue de HLA.
 
-La primera versión registra una comida por empleado y día y reporta el total
-por empleado dentro de un rango de fechas. No incluye menús, precios ni
-subsidios.
+El módulo de consumos registra una comida por empleado y día y reporta el total
+por empleado dentro de un rango de fechas. En **Menú del día** se capturan los
+platillos y extras diarios; los platillos extra fijos activos aparecen
+automáticamente cada día y se pueden desactivar cuando ya no se ofrezcan.
 
 ### Desarrollo local
 
@@ -38,8 +39,9 @@ ejecutar `npm run build` en el contenedor `workspace` para este proyecto.
    Configura `HLA_DOCKER_NETWORK` con el nombre encontrado, además de
    `DB_DATABASE`, `DB_USERNAME` y `DB_PASSWORD`. `DB_HOST=mysql` apunta al
    servicio Laradock por su alias de red. Usa una cuenta dedicada con permisos
-   mínimos, no `root`, y ajusta `APP_URL` al hostname HTTPS del servidor más
-   el prefijo `/comedor`. `ASSET_URL` debe conservar el mismo prefijo.
+   mínimos, no `root`, y ajusta `APP_URL` al hostname HTTPS del servidor, sin
+   el prefijo `/comedor`, que ya forma parte
+   de las rutas. `ASSET_URL` debe conservar el prefijo `/comedor`.
    Mantén `SESSION_SECURE_COOKIE=true` cuando se accede por HTTPS. Si el
    despliegue se prueba directamente por HTTP (sin TLS), configúralo en `false`
    tanto en `.env` como en la variable del servicio Compose; el navegador no
@@ -61,8 +63,18 @@ ejecutar `npm run build` en el contenedor `workspace` para este proyecto.
    con un certificado TLS válido y redirección de HTTP a HTTPS. Comprueba que
    Nginx y COMEDOR-RH compartan la red Docker configurada. En el firewall
    permite el puerto HTTPS (443) y no publiques el puerto HTTP del contenedor.
-   Abre `https://<hostname>/comedor/login` y crea una cuenta con
-   `docker compose exec comedor-rh php artisan comedor:operator`.
+   Aplica las migraciones aprobadas con el DBA antes de liberar, incluyendo
+   `2026_10_27_120000_add_username_and_admin_to_comedor_rh_users_table` y
+   `2026_10_27_130000_create_comedor_rh_menu_dia_extras_fijos_table`. Las cuentas existentes reciben como usuario la
+   parte anterior a `@` de su correo, normalizada si hace falta; desde entonces
+   inician sesión con ese usuario. Abre `https://<hostname>/comedor/login` para
+   acceder. La primera cuenta creada con
+   `docker compose exec comedor-rh php artisan comedor:operator` será
+   administradora. En una instalación existente, el DBA/operador del servidor
+   debe promover la cuenta elegida una sola vez con
+   `docker compose exec comedor-rh php artisan comedor:admin <usuario>`.
+   Después, esa cuenta puede crear usuarios desde **Administrar usuarios** en el
+   menú principal. El registro no está disponible para usuarios sin iniciar sesión.
 
 El Compose no ejecuta migraciones. Antes de liberar, coordina con HLA la creación
 de las tablas `comedor_rh_users` y `comedor_rh_consumos`; la aplicación usa una

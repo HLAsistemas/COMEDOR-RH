@@ -9,8 +9,8 @@
         <form method="post" action="{{ route('login.store') }}">
             @csrf
             <div style="margin-bottom: 1rem">
-                <label for="email">Correo</label>
-                <input id="email" name="email" type="email" autocomplete="username" value="{{ old('email') }}" required autofocus>
+                <label for="username">Usuario</label>
+                <input id="username" name="username" type="text" autocomplete="username" value="{{ old('username') }}" required autofocus>
             </div>
             <div style="margin-bottom: 1rem">
                 <label for="password">Contraseña</label>

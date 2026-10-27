@@ -15,7 +15,7 @@ class User extends Authenticatable
 
     protected $table = 'comedor_rh_users';
 
-    protected $fillable = ['name', 'email', 'password', 'is_active'];
+    protected $fillable = ['name', 'username', 'email', 'password', 'is_active', 'is_admin'];
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -27,5 +27,6 @@ class User extends Authenticatable
     protected $casts = [
         'password' => 'hashed',
         'is_active' => 'boolean',
+        'is_admin' => 'boolean',
     ];
 }
