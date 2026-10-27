@@ -97,10 +97,12 @@
         @auth
             <div class="header-nav">
                 <a href="{{ route('menu') }}">Menú</a>
-                <a href="{{ route('menu-dia.index') }}">Menú del día</a>
-                <a href="{{ route('consumos.index') }}">Registro</a>
+                @if (auth()->user()->is_admin !== 3)
+                    <a href="{{ route('menu-dia.index') }}">Menú del día</a>
+                    <a href="{{ route('consumos.index') }}">Registro</a>
+                @endif
                 <a href="{{ route('reportes.index') }}">Reporte</a>
-                @if (auth()->user()->is_admin)
+                @if (auth()->user()->is_admin === 1)
                     <a href="{{ route('usuarios.index') }}">Usuarios</a>
                 @endif
                 <span>{{ auth()->user()->name }}</span>

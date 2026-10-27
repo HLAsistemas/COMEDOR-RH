@@ -57,7 +57,7 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->email }}</td>
-                            <td>{{ $user->is_admin ? 'Administrador' : 'Operador' }}</td>
+                            <td>{{ match ($user->is_admin) { 1 => 'Administrador', 3 => 'Solo reportes', default => 'Operador' } }}</td>
                             <td>{{ $user->is_active ? 'Activo' : 'Inactivo' }}</td>
                         </tr>
                     @empty

@@ -38,7 +38,7 @@ Artisan::command('comedor:operator', function () {
         return Command::FAILURE;
     }
 
-    $isFirstAdmin = ! User::query()->where('is_admin', true)->exists();
+    $isFirstAdmin = ! User::query()->where('is_admin', 1)->exists();
 
     User::query()->create([
         'name' => $name,

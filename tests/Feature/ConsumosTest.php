@@ -78,6 +78,27 @@ class ConsumosTest extends TestCase
             ->assertSee(route('reportes.index'));
     }
 
+    public function test_user_with_is_admin_three_only_sees_the_report_option_on_the_main_menu(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Consulta reportes',
+            'username' => 'consulta-reportes',
+            'email' => 'consulta@example.test',
+            'is_admin' => 3,
+        ]);
+
+        $this->actingAs($user)
+            ->get(route('menu'))
+            ->assertOk()
+            ->assertSee('Reporte por rango de fechas')
+            ->assertSee(route('reportes.index'))
+            ->assertDontSee('href="'.route('menu-dia.index').'"', false)
+            ->assertDontSee('href="'.route('consumos.index').'"', false)
+            ->assertDontSee('Captura y consulta los platillos disponibles para hoy.')
+            ->assertDontSee('Busca al empleado y registra su comida del día.')
+            ->assertDontSee('Administrar usuarios');
+    }
+
     public function test_meal_registration_page_does_not_show_the_report(): void
     {
         $this->actingAs($this->crearOperador())

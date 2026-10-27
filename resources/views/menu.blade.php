@@ -8,27 +8,29 @@
         <p class="muted">Selecciona el módulo al que deseas ingresar.</p>
 
         <div class="menu-grid">
-            <a class="menu-card" href="{{ route('menu-dia.index') }}">
-                <span class="menu-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 3v18M4 3c5 3 5 7 0 10M12 3v18M12 3c5 3 5 7 0 10M20 3v18M20 3c-5 3-5 7 0 10" />
-                    </svg>
-                </span>
-                <strong>Menú del día</strong>
-                <p>Captura y consulta los platillos disponibles para hoy.</p>
-                <span class="menu-open">Abrir menú del día →</span>
-            </a>
+            @if (auth()->user()->is_admin !== 3)
+                <a class="menu-card" href="{{ route('menu-dia.index') }}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 3v18M4 3c5 3 5 7 0 10M12 3v18M12 3c5 3 5 7 0 10M20 3v18M20 3c-5 3-5 7 0 10" />
+                        </svg>
+                    </span>
+                    <strong>Menú del día</strong>
+                    <p>Captura y consulta los platillos disponibles para hoy.</p>
+                    <span class="menu-open">Abrir menú del día →</span>
+                </a>
 
-            <a class="menu-card" href="{{ route('consumos.index') }}">
-                <span class="menu-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 3v7a3 3 0 0 0 6 0V3M7 3v18M16 3v18M16 3c3 2 4 5 4 8h-4" />
-                    </svg>
-                </span>
-                <strong>Registro de comidas</strong>
-                <p>Busca al empleado y registra su comida del día.</p>
-                <span class="menu-open">Abrir registro →</span>
-            </a>
+                <a class="menu-card" href="{{ route('consumos.index') }}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 3v7a3 3 0 0 0 6 0V3M7 3v18M16 3v18M16 3c3 2 4 5 4 8h-4" />
+                        </svg>
+                    </span>
+                    <strong>Registro de comidas</strong>
+                    <p>Busca al empleado y registra su comida del día.</p>
+                    <span class="menu-open">Abrir registro →</span>
+                </a>
+            @endif
 
             <a class="menu-card" href="{{ route('reportes.index') }}">
                 <span class="menu-icon" aria-hidden="true">
@@ -42,7 +44,7 @@
                 <span class="menu-open">Abrir reporte →</span>
             </a>
 
-            @if (auth()->user()->is_admin)
+            @if (auth()->user()->is_admin === 1)
                 <a class="menu-card" href="{{ route('usuarios.index') }}">
                     <span class="menu-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
