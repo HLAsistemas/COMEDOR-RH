@@ -36,11 +36,11 @@ class UsersController extends Controller
             ],
             'email' => ['nullable', 'email', 'max:255', Rule::unique('comedor_rh_users', 'email')],
             'password' => ['required', 'string', 'min:12', 'confirmed'],
+            'is_admin' => ['required', 'integer', Rule::in([1, 2, 3])],
         ]);
 
         User::query()->create($data + [
             'is_active' => true,
-            'is_admin' => false,
         ]);
 
         return redirect()

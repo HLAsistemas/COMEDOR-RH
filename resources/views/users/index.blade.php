@@ -27,6 +27,15 @@
                     @error('email') <p class="form-error">{{ $message }}</p> @enderror
                 </div>
                 <div>
+                    <label for="is_admin">Tipo de acceso</label>
+                    <select id="is_admin" name="is_admin" required>
+                        <option value="1" @selected(old('is_admin', '2') == '1')>1 - Administrador</option>
+                        <option value="2" @selected(old('is_admin', '2') == '2')>2 - Operador</option>
+                        <option value="3" @selected(old('is_admin', '2') == '3')>3 - Solo reportes</option>
+                    </select>
+                    @error('is_admin') <p class="form-error">{{ $message }}</p> @enderror
+                </div>
+                <div>
                     <label for="password">Contraseña (mínimo 12 caracteres)</label>
                     <input id="password" name="password" type="password" minlength="12" autocomplete="new-password" required>
                     @error('password') <p class="form-error">{{ $message }}</p> @enderror
@@ -57,7 +66,7 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->username }}</td>
                             <td>{{ $user->email }}</td>
-                            <td>{{ match ($user->is_admin) { 1 => 'Administrador', 3 => 'Solo reportes', default => 'Operador' } }}</td>
+                            <td>{{ match ($user->is_admin) { 1 => '1 - Administrador', 2 => '2 - Operador', 3 => '3 - Solo reportes', default => 'Sin tipo' } }}</td>
                             <td>{{ $user->is_active ? 'Activo' : 'Inactivo' }}</td>
                         </tr>
                     @empty

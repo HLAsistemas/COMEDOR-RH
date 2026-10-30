@@ -39,6 +39,7 @@ class UsersTest extends TestCase
                 'username' => 'nuevo.operador',
                 'password' => 'secure-password-123',
                 'password_confirmation' => 'secure-password-123',
+                'is_admin' => 2,
             ])
             ->assertRedirect(route('usuarios.index'))
             ->assertSessionHas('status', 'El usuario se creó correctamente.');
@@ -48,7 +49,53 @@ class UsersTest extends TestCase
             'username' => 'nuevo.operador',
             'email' => null,
             'is_active' => true,
-            'is_admin' => false,
+            'is_admin' => 2,
+        ]);
+    }
+
+    public function test_administrator_can_create_users_with_each_access_type(): void
+    {
+        $admin = $this->crearUsuario(['username' => 'admin', 'is_admin' => 1]);
+
+        foreach ([1, 2, 3] as $accessType) {
+            $username = 'usuario.tipo'.$accessType;
+
+            $this->actingAs($admin)
+                ->post(route('usuarios.store'), [
+                    'name' => 'Usuario tipo '.$accessType,
+                    'username' => $username,
+                    'password' => 'secure-password-123',
+                    'password_confirmation' => 'secure-password-123',
+                    'is_admin' => $accessType,
+                ])
+                ->assertRedirect(route('usuarios.index'))
+                ->assertSessionHasNoErrors();
+
+            $this->assertDatabaseHas('comedor_rh_users', [
+                'username' => $username,
+                'is_admin' => $accessType,
+            ]);
+        }
+    }
+
+    public function test_administrator_cannot_create_a_user_with_an_invalid_access_type(): void
+    {
+        $admin = $this->crearUsuario(['username' => 'admin', 'is_admin' => 1]);
+
+        $this->actingAs($admin)
+            ->from(route('usuarios.index'))
+            ->post(route('usuarios.store'), [
+                'name' => 'Usuario inválido',
+                'username' => 'usuario-invalido',
+                'password' => 'secure-password-123',
+                'password_confirmation' => 'secure-password-123',
+                'is_admin' => 4,
+            ])
+            ->assertRedirect(route('usuarios.index'))
+            ->assertSessionHasErrors('is_admin');
+
+        $this->assertDatabaseMissing('comedor_rh_users', [
+            'username' => 'usuario-invalido',
         ]);
     }
 
@@ -65,6 +112,7 @@ class UsersTest extends TestCase
                 'email' => 'otro@example.test',
                 'password' => 'secure-password-123',
                 'password_confirmation' => 'secure-password-123',
+                'is_admin' => 2,
             ])
             ->assertRedirect(route('usuarios.index'))
             ->assertSessionHasErrors('username');
