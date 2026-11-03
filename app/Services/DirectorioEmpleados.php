@@ -57,12 +57,7 @@ class DirectorioEmpleados
 
         foreach ($empresas as $claveEmpresa => $datosEmpresa) {
             $empleados = $this->consultaActivos($datosEmpresa['tabla'])
-                ->where(function (Builder $query) use ($termino) {
-                    $query->where('CLAVE', 'like', $termino . '%')
-                        ->orWhere('NOMBRE', 'like', '%' . $termino . '%')
-                        ->orWhere('AP_PAT_', 'like', '%' . $termino . '%')
-                        ->orWhere('AP_MAT_', 'like', '%' . $termino . '%');
-                })
+                ->where('CLAVE', 'like', $termino . '%')
                 ->orderByRaw('CASE WHEN CLAVE = ? THEN 0 ELSE 1 END', [$termino])
                 ->orderBy('NOMBRE')
                 ->orderBy('AP_PAT_')

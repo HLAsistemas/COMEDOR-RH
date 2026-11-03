@@ -22,7 +22,7 @@
                 <div class="search-term">
                     <label for="termino-empleado">Buscar o escanear clave</label>
                     <div class="inline">
-                        <input id="termino-empleado" type="search" maxlength="100" autocomplete="off" placeholder="Clave o nombre del empleado" autofocus>
+                        <input id="termino-empleado" type="search" maxlength="100" autocomplete="off" placeholder="Clave del empleado" autofocus>
                         <button type="submit">Buscar</button>
                     </div>
                 </div>
@@ -223,7 +223,6 @@
             const employee = employees.find((candidate) =>
                 candidate.clave === decoded.employeeKey
                 && normalizeCodePart(candidate.empresa_nombre) === normalizedCompany
-                && normalizeCodePart(candidate.nombre).includes(normalizeCodePart(decoded.employeeName))
             );
 
             if (!employee) {
@@ -265,7 +264,7 @@
         results.replaceChildren();
         const term = searchInput.value.trim();
         if (!term) {
-            window.showNotification('Escribe o escanea una clave o nombre.', 'error');
+            window.showNotification('Escribe o escanea una clave.', 'error');
             return;
         }
 

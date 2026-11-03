@@ -157,6 +157,21 @@ class ConsumosTest extends TestCase
             ->assertJsonPath('empleados.0.clave', '29');
     }
 
+    public function test_employee_search_ignores_names(): void
+    {
+        $operator = $this->crearOperador();
+        DB::table('trabajadores_hilatura_rh')->insert([
+            'CLAVE' => '500',
+            'NOMBRE' => 'Ana',
+            'STATUS' => 'A',
+        ]);
+
+        $this->actingAs($operator)
+            ->getJson(route('empleados.buscar', ['q' => 'Ana', 'empresa' => 'hilaturas']))
+            ->assertOk()
+            ->assertJsonCount(0, 'empleados');
+    }
+
     public function test_employee_search_returns_the_encoded_photo_url(): void
     {
         $operator = $this->crearOperador();
