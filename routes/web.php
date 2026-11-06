@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConsumosController;
 use App\Http\Controllers\MenuDiaController;
+use App\Http\Controllers\RequisicionesController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +31,10 @@ Route::prefix('comedor')->group(function () {
         Route::post('/menu-dia/extras-fijos', [MenuDiaController::class, 'storeFixedExtra'])->name('menu-dia.extras-fijos.store');
         Route::post('/menu-dia/extras-fijos/{extraFijo}/estado', [MenuDiaController::class, 'toggleFixedExtra'])->name('menu-dia.extras-fijos.toggle');
         Route::get('/consumos', [ConsumosController::class, 'index'])->name('consumos.index');
+        Route::get('/requisiciones', [RequisicionesController::class, 'index'])->name('requisiciones.index');
+        Route::post('/requisiciones', [RequisicionesController::class, 'store'])->name('requisiciones.store');
+        Route::get('/requisiciones/exportar', [RequisicionesController::class, 'exportar'])->name('requisiciones.exportar');
+        Route::post('/requisiciones/{requisicion}/responder', [RequisicionesController::class, 'responder'])->whereNumber('requisicion')->name('requisiciones.responder');
         Route::get('/reporte-comidas', [ConsumosController::class, 'reporte'])->name('reportes.index');
         Route::get('/reporte-comidas/exportar', [ConsumosController::class, 'exportarReporte'])->name('reportes.exportar');
         Route::get('/empleados/buscar', [ConsumosController::class, 'buscarEmpleados'])->name('empleados.buscar');

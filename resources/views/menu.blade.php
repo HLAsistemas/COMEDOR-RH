@@ -30,6 +30,17 @@
                     <p>Busca al empleado y registra su comida del día.</p>
                     <span class="menu-open">Abrir registro →</span>
                 </a>
+
+                <a class="menu-card" href="{{ route('requisiciones.index') }}">
+                    <span class="menu-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+                        </svg>
+                    </span>
+                    <strong>Requisiciones de insumos</strong>
+                    <p>Revisa las solicitudes, captura costos, acepta o cancela.</p>
+                    <span class="menu-open">Abrir requisiciones →</span>
+                </a>
             @endif
 
             <a class="menu-card" href="{{ route('reportes.index') }}">
