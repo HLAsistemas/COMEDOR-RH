@@ -31,6 +31,7 @@ Route::prefix('comedor')->group(function () {
         Route::post('/menu-dia/extras-fijos', [MenuDiaController::class, 'storeFixedExtra'])->name('menu-dia.extras-fijos.store');
         Route::post('/menu-dia/extras-fijos/{extraFijo}/estado', [MenuDiaController::class, 'toggleFixedExtra'])->name('menu-dia.extras-fijos.toggle');
         Route::get('/consumos', [ConsumosController::class, 'index'])->name('consumos.index');
+        Route::view('/consumos/pantalla', 'consumos.pantalla')->name('consumos.pantalla');
         Route::get('/requisiciones', [RequisicionesController::class, 'index'])->name('requisiciones.index');
         Route::post('/requisiciones', [RequisicionesController::class, 'store'])->name('requisiciones.store');
         Route::get('/requisiciones/exportar', [RequisicionesController::class, 'exportar'])->name('requisiciones.exportar');

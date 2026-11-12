@@ -110,6 +110,29 @@ class ConsumosTest extends TestCase
             ->assertDontSee('Reporte por rango de fechas');
     }
 
+    public function test_registration_page_links_to_the_customer_display(): void
+    {
+        $operator = $this->crearOperador();
+
+        $this->actingAs($operator)
+            ->get(route('consumos.index'))
+            ->assertOk()
+            ->assertSee('Abrir pantalla del cliente')
+            ->assertSee(route('consumos.pantalla'));
+
+        $this->actingAs($operator)
+            ->get(route('consumos.pantalla'))
+            ->assertOk()
+            ->assertSee('comedor-rh-pantalla-cliente')
+            ->assertSee('Presenta tu gafete para registrar tu comida.');
+    }
+
+    public function test_guests_cannot_open_the_customer_display(): void
+    {
+        $this->get(route('consumos.pantalla'))
+            ->assertRedirect(route('login'));
+    }
+
     public function test_report_page_does_not_show_meal_registration(): void
     {
         $this->actingAs($this->crearOperador())

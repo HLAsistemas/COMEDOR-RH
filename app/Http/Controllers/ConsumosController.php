@@ -273,7 +273,8 @@ class ConsumosController extends Controller
 
         return redirect()
             ->route('consumos.index')
-            ->with('status', "Comida registrada para {$empleado['nombre']} ({$empleado['clave']}).");
+            ->with('status', "Comida registrada para {$empleado['nombre']} ({$empleado['clave']}).")
+            ->with('empleado_registrado', $empleado);
     }
 
     private function esDuplicadoConsumo(QueryException $exception): bool

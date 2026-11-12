@@ -5,7 +5,10 @@
 @section('content')
     <section class="card">
         <h1>{{ today()->locale('es')->translatedFormat('l, j \d\e F \d\e Y') }}</h1>
-        <h2>Registro de comidas</h2>
+        <div class="inline" style="justify-content: space-between; align-items: center;">
+            <h2>Registro de comidas</h2>
+            <button id="abrir-pantalla-cliente" class="secondary" type="button" data-url="{{ route('consumos.pantalla') }}">Abrir pantalla del cliente</button>
+        </div>
         <p class="muted">Cada empleado puede tener un registro de comida por día. El padrón de HLA se consulta sin modificarlo.</p>
 
         <form id="busqueda-empleado" data-url="{{ route('empleados.buscar') }}">
@@ -170,6 +173,7 @@
         registrationEmployee.textContent =
             `${payload.empleado.nombre} — ${payload.empleado.empresa_nombre} — ${payload.empleado.clave}`;
         searchInput.value = '';
+        window.notifyCustomerDisplay({ tipo: 'exito', empleado: payload.empleado });
         registrationModal.showModal();
         clearTimeout(registrationModalTimeout);
         registrationModalTimeout = setTimeout(() => registrationModal.close(), 2000);
@@ -239,6 +243,14 @@
             qrRegistrationInProgress = false;
         }
     };
+
+    document.getElementById('abrir-pantalla-cliente').addEventListener('click', (event) => {
+        window.open(event.currentTarget.dataset.url, 'comedor-pantalla-cliente', 'popup,width=1280,height=800');
+    });
+
+    @if (session('empleado_registrado'))
+        window.notifyCustomerDisplay({ tipo: 'exito', empleado: @json(session('empleado_registrado')) });
+    @endif
 
     closeRegistrationModal.addEventListener('click', () => registrationModal.close());
     registrationModal.addEventListener('close', () => {

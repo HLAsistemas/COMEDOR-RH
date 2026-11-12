@@ -131,6 +131,12 @@
             let closeTimer;
             let audioContext;
 
+            // Envía el resultado del registro a la pantalla del cliente (segundo monitor).
+            const customerDisplayChannel = @json(request()->routeIs('consumos.index')) && 'BroadcastChannel' in window
+                ? new BroadcastChannel('comedor-rh-pantalla-cliente')
+                : null;
+            window.notifyCustomerDisplay = (data) => customerDisplayChannel?.postMessage(data);
+
             const prepareErrorAudio = () => {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 if (!AudioContext) return;
@@ -170,7 +176,10 @@
                 title.textContent = type === 'error' ? 'Error' : 'Aviso';
                 message.textContent = text;
                 modal.showModal();
-                if (type === 'error') playErrorSound();
+                if (type === 'error') {
+                    playErrorSound();
+                    window.notifyCustomerDisplay({ tipo: 'error', mensaje: text });
+                }
                 closeTimer = setTimeout(() => modal.close(), 2000);
             };
 
