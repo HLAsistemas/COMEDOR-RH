@@ -21,8 +21,25 @@ class ConsumosController extends Controller
 
     public function index(): View
     {
+        $empresas = $this->directorio->empresas();
+        $nombresEmpresas = collect($empresas)->pluck('nombre', 'clave');
+
+        $registrosHoy = DB::table('comedor_rh_consumos')
+            ->select('empresa', 'empleado_clave', 'empleado_nombre', 'created_at')
+            ->where('fecha_consumo', today()->toDateString())
+            ->orderByDesc('created_at')
+            ->orderByDesc('id')
+            ->get()
+            ->map(fn ($registro) => [
+                'hora' => $registro->created_at ? Carbon::parse($registro->created_at)->format('H:i') : '',
+                'clave' => $registro->empleado_clave,
+                'nombre' => $registro->empleado_nombre,
+                'empresa_nombre' => $nombresEmpresas->get($registro->empresa, $registro->empresa),
+            ]);
+
         return view('consumos.index', [
-            'empresas' => $this->directorio->empresas(),
+            'empresas' => $empresas,
+            'registrosHoy' => $registrosHoy,
         ]);
     }
 
@@ -244,6 +261,8 @@ class ConsumosController extends Controller
             ]);
         }
 
+        $registradoEn = now();
+
         try {
             DB::table('comedor_rh_consumos')->insert([
                 'empresa' => $empleado['empresa'],
@@ -251,8 +270,8 @@ class ConsumosController extends Controller
                 'empleado_nombre' => $empleado['nombre'],
                 'fecha_consumo' => $fechaConsumo,
                 'registrado_por' => $request->user()->id,
-                'created_at' => now(),
-                'updated_at' => now(),
+                'created_at' => $registradoEn,
+                'updated_at' => $registradoEn,
             ]);
         } catch (QueryException $exception) {
             if (! $this->esDuplicadoConsumo($exception)) {
@@ -268,6 +287,12 @@ class ConsumosController extends Controller
             return response()->json([
                 'message' => 'Comida registrada.',
                 'empleado' => $empleado,
+                'registro' => [
+                    'hora' => $registradoEn->format('H:i'),
+                    'clave' => $empleado['clave'],
+                    'nombre' => $empleado['nombre'],
+                    'empresa_nombre' => $empleado['empresa_nombre'],
+                ],
             ]);
         }
 

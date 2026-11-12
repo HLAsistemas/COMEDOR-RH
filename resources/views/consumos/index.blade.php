@@ -42,6 +42,36 @@
             <button id="registrar-consumo" type="submit" disabled>Registrar una comida</button>
         </form>
     </section>
+    <section class="card">
+        <h2>Registros de hoy</h2>
+        <div class="summary">
+            <strong id="total-registros-hoy">{{ $registrosHoy->count() }}</strong>
+            <span>comidas registradas</span>
+        </div>
+        <p id="sin-registros-hoy" class="muted" @if ($registrosHoy->isNotEmpty()) hidden @endif>Aún no hay comidas registradas hoy.</p>
+        <div class="table-wrap" id="tabla-registros-hoy" @if ($registrosHoy->isEmpty()) hidden @endif>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Clave</th>
+                        <th>Empleado</th>
+                        <th>Empresa</th>
+                    </tr>
+                </thead>
+                <tbody id="registros-hoy">
+                    @foreach ($registrosHoy as $registro)
+                        <tr>
+                            <td>{{ $registro['hora'] }}</td>
+                            <td>{{ $registro['clave'] }}</td>
+                            <td>{{ $registro['nombre'] }}</td>
+                            <td>{{ $registro['empresa_nombre'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </section>
     <dialog id="comida-registrada-modal" class="meal-confirmation" aria-labelledby="comida-registrada-titulo">
         <div class="meal-confirmation-content">
             <h2 id="comida-registrada-titulo">Comida registrada</h2>
@@ -68,6 +98,10 @@
     const registrationPhoto = document.getElementById('comida-registrada-foto');
     const registrationEmployee = document.getElementById('comida-registrada-empleado');
     const closeRegistrationModal = document.getElementById('cerrar-comida-registrada');
+    const todayTotal = document.getElementById('total-registros-hoy');
+    const todayRows = document.getElementById('registros-hoy');
+    const todayTable = document.getElementById('tabla-registros-hoy');
+    const todayEmpty = document.getElementById('sin-registros-hoy');
     let qrRegistrationInProgress = false;
     let registrationModalTimeout;
 
@@ -96,6 +130,20 @@
         recordButton.disabled = false;
         searchStatus.textContent = '';
         results.replaceChildren();
+    };
+
+    const addTodayRecord = (record) => {
+        if (!record) return;
+        const row = document.createElement('tr');
+        [record.hora, record.clave, record.nombre, record.empresa_nombre].forEach((value) => {
+            const cell = document.createElement('td');
+            cell.textContent = value ?? '';
+            row.append(cell);
+        });
+        todayRows.prepend(row);
+        todayTotal.textContent = String(todayRows.children.length);
+        todayTable.hidden = false;
+        todayEmpty.hidden = true;
     };
 
     const normalizeCodePart = (value) => value
@@ -173,6 +221,7 @@
         registrationEmployee.textContent =
             `${payload.empleado.nombre} — ${payload.empleado.empresa_nombre} — ${payload.empleado.clave}`;
         searchInput.value = '';
+        addTodayRecord(payload.registro);
         window.notifyCustomerDisplay({ tipo: 'exito', empleado: payload.empleado });
         registrationModal.showModal();
         clearTimeout(registrationModalTimeout);

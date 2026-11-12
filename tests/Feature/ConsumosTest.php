@@ -250,8 +250,43 @@ class ConsumosTest extends TestCase
         ]);
     }
 
+    public function test_registration_page_lists_only_todays_meals_with_their_count(): void
+    {
+        $operator = $this->crearOperador();
+        $registro = [
+            'empresa' => 'hilaturas',
+            'registrado_por' => $operator->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+        DB::table('comedor_rh_consumos')->insert([
+            $registro + ['empleado_clave' => '00123', 'empleado_nombre' => 'Ana López Ruiz', 'fecha_consumo' => today()->toDateString()],
+            $registro + ['empleado_clave' => '00456', 'empleado_nombre' => 'Luis Pérez Gómez', 'fecha_consumo' => today()->toDateString()],
+            $registro + ['empleado_clave' => '00789', 'empleado_nombre' => 'Registro De Ayer', 'fecha_consumo' => today()->subDay()->toDateString()],
+        ]);
+
+        $this->actingAs($operator)
+            ->get(route('consumos.index'))
+            ->assertOk()
+            ->assertSee('Registros de hoy')
+            ->assertSee('<strong id="total-registros-hoy">2</strong>', false)
+            ->assertSee('Ana López Ruiz')
+            ->assertSee('Luis Pérez Gómez')
+            ->assertDontSee('Registro De Ayer');
+    }
+
+    public function test_registration_page_shows_empty_state_when_no_meals_today(): void
+    {
+        $this->actingAs($this->crearOperador())
+            ->get(route('consumos.index'))
+            ->assertOk()
+            ->assertSee('<strong id="total-registros-hoy">0</strong>', false)
+            ->assertSee('Aún no hay comidas registradas hoy.');
+    }
+
     public function test_scanned_meal_registration_returns_employee_data_for_confirmation_modal(): void
     {
+        $this->freezeTime();
         $operator = $this->crearOperador();
         DB::table('trabajadores_gecoad_rh')->insert([
             'CLAVE' => '00123',
@@ -273,7 +308,10 @@ class ConsumosTest extends TestCase
                 'empleado.foto_url',
                 'https://intranethlangeles.com/img/FOTOS%20PERSONAL%20HLA%202022/'
                     . 'GECOAD/000123_Ana%20L%C3%B3pez%20Ruiz.jpg'
-            );
+            )
+            ->assertJsonPath('registro.clave', '00123')
+            ->assertJsonPath('registro.nombre', 'Ana López Ruiz')
+            ->assertJsonPath('registro.hora', now()->format('H:i'));
 
         $this->assertDatabaseCount('comedor_rh_consumos', 1);
     }
